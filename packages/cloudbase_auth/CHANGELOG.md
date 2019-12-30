@@ -1,3 +1,3 @@
-## 0.0.1
+## [0.0.1] - 2020.01.14
 
-* TODO: Describe initial release.
+* 支持微信登录

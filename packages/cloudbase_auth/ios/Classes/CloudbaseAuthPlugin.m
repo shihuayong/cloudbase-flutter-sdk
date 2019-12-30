@@ -1,4 +1,5 @@
 #import "CloudbaseAuthPlugin.h"
+#import "CloudbaseWxAuth.h"
 
 @implementation CloudbaseAuthPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
@@ -10,11 +11,29 @@
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-  if ([@"getPlatformVersion" isEqualToString:call.method]) {
-    result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
+  if ([@"wxauth.register" isEqualToString:call.method]) {
+    [self handleWxAuthRegister:call callback:result];
+  } else if ([@"wxauth.login" isEqualToString:call.method]) {
+    [self handleWxAuthLogin:call callback:result];
   } else {
     result(FlutterMethodNotImplemented);
   }
+}
+
+- (void)handleWxAuthRegister:(FlutterMethodCall*)call callback:(FlutterResult)callback {
+  NSDictionary* arguments = (NSDictionary*)call.arguments;
+  [CloudbaseWxAuth initialize:arguments[@"wxAppId"] link:arguments[@"wxUniLink"] callback:callback];
+  callback(nil);
+}
+
+- (void)handleWxAuthLogin:(FlutterMethodCall*)call callback:(FlutterResult)callback {
+  CloudbaseWxAuth *instance = [CloudbaseWxAuth getInstance];
+  if (instance == nil) {
+    callback([FlutterError errorWithCode:@"WX_AUTH_NO_INSTANCE" message:@"WX_AUTH_NO_INSTANCE" details:nil]);
+    return;
+  }
+  
+  [instance login:callback];
 }
 
 @end

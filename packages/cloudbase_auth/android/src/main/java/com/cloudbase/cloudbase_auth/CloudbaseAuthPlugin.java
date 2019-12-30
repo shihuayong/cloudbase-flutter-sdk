@@ -34,11 +34,6 @@ public class CloudbaseAuthPlugin implements FlutterPlugin, MethodCallHandler {
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-    if (call.method.equals("getPlatformVersion")) {
-      result.success("Android " + android.os.Build.VERSION.RELEASE);
-    } else {
-      result.notImplemented();
-    }
     switch (call.method) {
       case "wxauth.register":
         handleWxAuthRegister(call, result);
@@ -56,22 +51,20 @@ public class CloudbaseAuthPlugin implements FlutterPlugin, MethodCallHandler {
   private void handleWxAuthRegister(MethodCall call, Result result) {
     Map<String, String> arguments = call.arguments();
     String wxAppId = arguments.get("wxAppId");
-    CloudbaseWxAuth wxAuth = CloudbaseWxAuth.initialize(wxAppId);
-    if (wxAuth != null) {
+    try {
+      CloudbaseWxAuth.initialize(wxAppId);
       result.success(null);
-    } else {
-      //todo: 补充错误码
-      result.error("wxAuthInitFailed", null, null);
+    } catch (Exception e) {
+      result.error("WX_AUTH_REGISTER_FAILED", "WX_AUTH_REGISTER_FAILED", null);
     }
   }
 
   private void handleWxAuthLogin(MethodCall call, Result result) {
     CloudbaseWxAuth wxAuth = CloudbaseWxAuth.getInstance();
     if (wxAuth != null) {
-      wxAuth.login();
-      result.success(null);
+      wxAuth.login(result);
     } else {
-      result.error("wxAuthNoInstance", null, null);
+      result.error("WX_AUTH_NO_INSTANCE", "WX_AUTH_NO_INSTANCE", null);
     }
   }
 }
