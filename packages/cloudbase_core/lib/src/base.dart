@@ -7,20 +7,37 @@ class CloudBaseConfig {
 
   /// 环境 id
   String envId;
+  String env;
 
   /// 使用微信登录时, 必须设置这些属性
   String wxAppId;
   String wxUniLink;
 
-  CloudBaseConfig({this.envId, this.timeout, this.wxAppId});
+  CloudBaseConfig({this.env, this.envId, this.timeout, this.wxAppId, this.wxUniLink}) {
+    assert(env != null || envId != null);
+
+    _adapt();
+  }
 
   CloudBaseConfig.fromMap(Map<String, dynamic> map) {
     timeout = map['timeout'];
     envId = map['envId'];
+    env = map['env'];
     wxAppId = map['wxAppId'];
     wxUniLink = map['wxUniLink'];
 
-    assert(envId != null && envId.isNotEmpty);
+    assert(env != null || envId != null);
+
+    _adapt();
+  }
+
+  void _adapt() {
+    /// 兼容envId的用法
+    if (env != null) {
+      envId = env;
+    } else if (envId != null) {
+      env = envId;
+    }
   }
 }
 
@@ -81,7 +98,7 @@ class CloudBaseCore {
   }
 
   factory CloudBaseCore.init(Map<String, dynamic> map) {
-    String envId = map['envId'];
+    String envId = map['env'] != null ? map['env'] : map['envId'];
 
     // 没有缓存
     if (envId == null && _cache[envId] == null) {

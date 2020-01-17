@@ -1,2 +1,2 @@
-export 'src/baseAuth.dart';
-export 'src/wxAuth.dart';
+export 'src/index.dart';
+export 'src/interface.dart';

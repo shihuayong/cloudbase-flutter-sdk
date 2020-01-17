@@ -7,6 +7,7 @@ import 'package:cloudbase_function/cloudbase_function.dart';
 import 'package:cloudbase_storage/cloudbase_storage.dart';
 import 'package:demo/constance.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:dio/dio.dart';
 
 class TestPage extends StatefulWidget {
   TestPage({Key key, this.title}) : super(key: key);
@@ -18,7 +19,7 @@ class TestPage extends StatefulWidget {
 }
 
 class _TestPage extends State<TestPage> {
-  String _text = '测试前请先登录微信';
+  String _text = '测试前请先登录';
   CloudBaseCore _core;
 
   _TestPage() {
@@ -126,6 +127,90 @@ class _TestPage extends State<TestPage> {
     }
   }
 
+  _anonymousLogin() async {
+    CloudBaseAuth auth = CloudBaseAuth(_core);
+    CloudBaseAuthState authState = await auth.getAuthState().catchError((e) {
+      _text = e.toString();
+    });
+
+    if (authState != null && authState.authType == CloudBaseAuthType.ANONYMOUS) {
+      setState(() {
+        _text = '匿名登录态已存在';
+      });
+    } else {
+      await auth.signInAnonymously().then((success) {
+        setState(() {
+          _text = '匿名登录成功';
+        });
+      }).catchError((e) {
+        setState(() {
+          _text = e.toString();
+        });
+      });
+    }
+  }
+  
+  _customLogin() async {
+    CloudBaseAuth auth = CloudBaseAuth(_core);
+    CloudBaseAuthState authState = await auth.getAuthState().catchError((e) {
+      _text = e.toString();
+    });
+
+    if (authState != null && authState.authType == CloudBaseAuthType.CUSTOM) {
+      _text = '自定义登录态已存在';
+    } else {
+      Dio dio = Dio(BaseOptions(
+          headers: {
+            'Connection': 'Keep-Alive',
+            'User-Agent': 'cloudbase-flutter-sdk/0.0.1'
+          },
+          contentType: 'application/json',
+          responseType: ResponseType.json,
+          queryParameters: {'env': _core.config.envId},
+          sendTimeout: 3000));
+      Response response = await dio.post('https://test-cloud-f7c3g.service.tcloudbase.com/getTicket');
+      String ticket = response.data['ticket'];
+
+      await auth.signInWithTicket(ticket).then((success) {
+        setState(() {
+          _text = '自定义登录成功';
+        });
+      }).catchError((e) {
+        setState(() {
+          _text = '自定义登录失败：${e.toString()}';
+        });
+      });
+    }
+  }
+
+  _getUserInfo() async {
+    CloudBaseAuth auth = CloudBaseAuth(_core);
+    await auth.getUserInfo().then((userInfo) {
+      setState(() {
+        _text = userInfo.toString();
+      });
+    })
+    .catchError((e) {
+      setState(() {
+        _text = e.toString();
+      });
+    });
+  }
+
+  _signOut() async {
+    CloudBaseAuth auth = CloudBaseAuth(_core);
+    await auth.signOut().then((success) {
+      setState(() {
+        _text = '退出登录成功';
+      });
+    })
+    .catchError((e) {
+      setState(() {
+        _text = e.toString();
+      });
+    });
+  }
+
   _callFunctionTest() async {
     CloudBaseWxAuth(_core);
     CloudBaseFunction cloudbaseFunc = CloudBaseFunction(_core);
@@ -184,8 +269,12 @@ class _TestPage extends State<TestPage> {
                 ),
               ),
               buildButton('微信登录', _wxLogin),
+              buildButton('匿名登录', _anonymousLogin),
+              buildButton('自定义登录', _customLogin),
+              buildButton('获取用户信息', _getUserInfo),
               buildButton('调用函数测试', _callFunctionTest),
               buildButton('文件测试', _fileTest),
+              buildButton('退出登录', _signOut),
             ],
           ),
         ) // This trailing comma makes auto-formatting nicer for build methods.

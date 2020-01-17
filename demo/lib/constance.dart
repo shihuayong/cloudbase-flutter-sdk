@@ -18,7 +18,7 @@ const MainMaterialColor = const MaterialColor(0xff006eff, colorMap);
 const MainColor = const Color(0xff006eff);
 
 const baseConfig = {
-  'envId': 'zdev', 
+  'env': 'test-cloud-5f25f8',
   'wxAppId': 'wx83757a683cf405fe', 
   'wxUniLink': 'https://test-cloud-5f25f8.tcloudbaseapp.com/'
 };

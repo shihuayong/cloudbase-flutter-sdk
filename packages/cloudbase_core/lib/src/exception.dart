@@ -23,6 +23,9 @@ class CloudBaseExceptionCode {
   /// 获取授权失败
   static const AUTH_FAILED = 'AUTH_FAILED';
 
+  /// 登出失败
+  static const SIGN_OUT_FAILED = 'SIGN_OUT_FAILED';
+
   /// refreshToken 过期
   static const REFRESH_TOKEN_EXPIRED = 'REFRESH_TOKEN_EXPIRED';
 

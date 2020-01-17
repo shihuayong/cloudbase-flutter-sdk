@@ -1,5 +1,3 @@
-# CloudBase Flutter SDK
-
 CloudBase Flutter SDK 是腾讯云云开发（Tencent Cloud Base）多端 SDK 中的一员，主要支持 Flutter 框架下使用云开发能力。CloudBase 提供 Serverless 云端一体化服务，使用 CloudBase，可以快速构建小程序、移动App、网页等应用。
 
 ## Flutter 插件
@@ -9,7 +7,7 @@ CloudBase Flutter SDK 提供一系列插件，可以根据场景按需加载。
 | Plugin                             | Version                        | 文档                               | 描述
 | ---------------------------------- | ------------------------------ | ---------------------------------- | ----------------------
 | [cloudbase_core][core_pub]         | ![pub package][core_badge]     | [CloudBase Core][core_doc]         | 核心库，初始化环境等
-| [cloudbase_auth][auth_pub]         | ![pub package][auth_badge]     | [CloudBase Auth][auth_doc]         | 鉴权库，包括微信登录等能力
+| [cloudbase_auth][auth_pub]         | ![pub package][auth_badge]     | [CloudBase Auth][auth_doc]         | 鉴权库，支持微信登录、自定义登录、匿名登录等
 | [cloudbase_function][function_pub] | ![pub package][function_badge] | [CloudBase Function][function_doc] | 支持云函数能力
 | [cloudbase_storage][storage_pub]   | ![pub package][storage_badge]  | [CloudBase Storage][storage_doc]   | 支持对象存储能力
 
@@ -32,11 +30,15 @@ CloudBase Flutter SDK 提供一系列插件，可以根据场景按需加载。
 
 在 [腾讯云云开发控制台](https://console.cloud.tencent.com/tcb) 创建环境（已有环境可跳过）。
 
-<img src="./img/1.png">
+<img src="https://tencentcloudbase.github.io/flutter/env/1.png">
+
+在[用户管理页面](https://console.cloud.tencent.com/tcb/user)中，点击“登录设置”，然后**启用匿名登录**：
+
+<img src="https://tencentcloudbase.github.io/flutter/auth/1.png">
 
 新建云函数 `sum`。
 
-<img src="./img/2.png">
+<img src="https://tencentcloudbase.github.io/flutter/env/2.png">
 
 在 `sum` 云函数中添加代码。
 
@@ -60,8 +62,8 @@ $ cd cloudbase_demo
 
 ```yaml
 dependencies:
-  cloudbase_core: ^0.0.1
-  cloudbase_auth: ^0.0.1
+  cloudbase_core: ^0.0.2
+  cloudbase_auth: ^0.0.2
   cloudbase_functions: ^0.0.1
 ```
 
@@ -71,13 +73,9 @@ dependencies:
 $ flutter pub get
 ```
 
-### 4. 微信登录额外配置
+### 4. 调用云函数
 
-根据 [CloudBaseAuth 详细教程-微信登录](./packages/cloudbase_auth/doc/wxauth.md) 作好微信登录前的必要配置。( Android 配置相对简单，建议先在 Android 端体验)
-
-### 5. 调用云函数
-
-在项目的 `lib/main.dart` 文件中进行微信登录，并调用运用 `sum` 云函数。
+在项目的 `lib/main.dart` 文件中进行匿名登录，并调用运用 `sum` 云函数。
 
 ```dart
 import 'package:cloudbase_auth/cloudbase_core.dart';
@@ -86,20 +84,19 @@ import 'package:cloudbase_function/cloudbase_function.dart';
 
 // 初始化 CloudBase
 CloudBaseCore core = CloudBaseCore.init({
-    // 填写你的云开发 envId 和微信开放平台 Appid
-    'envId': 'xxx',
-    'wxAppId': 'xxxx'
+    // 填写你的云开发 env
+    'env': 'your-env-id'
 });
 
-// 微信登录
-CloudBaseAuth auth = CloudBaseWxAuth(core);
-bool isLogin = await auth.isLogin();
+// 获取登录状态
+CloudBaseAuthState authState = await auth.getAuthState();
 
-if (!isLogin) {
-    await auth.login().catchError((e) {
-      // 处理微信登录错误
-      print(e);
-    })
+// 唤起匿名登录
+if (authState == null) {
+    await auth.signInAnonymously().catchError((err) {
+        // 处理匿名登录错误
+        print(e);
+    });
 }
 
 // 调用云函数
