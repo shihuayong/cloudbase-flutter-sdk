@@ -5,7 +5,7 @@ import './base.dart';
 
 const int _TCB_DEFAULT_TIMEOUT = 15000;
 const String _VERSION = '0.0.1';
-const String _DATA_VERSION = '2020-01-01';
+const String _DATA_VERSION = '2019-06-01';
 const String _TCB_WEB_URL = 'https://tcb-api.tencentcloudapi.com/web';
 
 class CloudBaseRequest {
