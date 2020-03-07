@@ -9,7 +9,7 @@ CloudBase Flutter SDK 提供一系列插件，可以根据场景按需加载。
 | [cloudbase_core][core_pub]         | ![pub package][core_badge]     | [CloudBase Core][core_doc]         | 核心库，初始化环境等
 | [cloudbase_auth][auth_pub]         | ![pub package][auth_badge]     | [CloudBase Auth][auth_doc]         | 鉴权库，支持微信登录、自定义登录、匿名登录等
 | [cloudbase_function][function_pub] | ![pub package][function_badge] | [CloudBase Function][function_doc] | 支持云函数能力
-| [cloudbase_database][database_pub]   | ![pub package][database_badge]  | [CloudBase database][database_doc]   | 支持对象存储能力
+| [cloudbase_database][database_pub]   | ![pub package][database_badge]  | [CloudBase Database][database_doc]   | 支持文档型数据库能力
 | [cloudbase_storage][storage_pub]   | ![pub package][storage_badge]  | [CloudBase Storage][storage_doc]   | 支持对象存储能力
 
 [core_pub]: https://pub.dartlang.org/packages/cloudbase_core
