@@ -36,6 +36,20 @@ void main() async {
       await runCases(db, cases[i]);
     }
   }, timeout: Timeout(Duration(minutes: 60)));
+
+  /// server date p0用例
+  test('server_data p0用例', () async {
+    var collection = db.collection('doc_wcc');
+    var res = await collection.add({
+      'description': 'eat an apple',
+      'createTime': db.serverDate()
+    });
+    expect(res.code == null, true);
+
+    var res2 = await collection.doc(res.id).get();
+    expect(res2.code == null, true);
+    expect(res2.data[0]['createTime'] is DateTime, true);
+  });
 }
 
 Future<dynamic> collectionOp(CloudBaseDatabase db, String cmd, dynamic event) async {

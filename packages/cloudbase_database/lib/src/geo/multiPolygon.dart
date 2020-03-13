@@ -23,6 +23,32 @@ class MultiPolygon {
   }
 
   static bool validate(data) {
+    if (data['type'] != 'MultiLineString' || !(data['coordinates'] is List)) {
+      return false;
+    }
+
+    List multiPolygon = data['coordinates'];
+    for (var i = 0; i < multiPolygon.length; i++) {
+      if (!(multiPolygon[i] is List)) {
+        return false;
+      }
+      List polygon = multiPolygon[i];
+
+      for (var j = 0; j < polygon.length; j++) {
+        if (!(polygon[j] is List)) {
+          return false;
+        }
+        List line = polygon[j];
+
+        for (var k = 0; k < line.length; k++) {
+          var point = line[k];
+          if (!(point[0] is num && point[1] is num)) {
+            return false;
+          }
+        }
+      }
+    }
+
     return true;
   }
 

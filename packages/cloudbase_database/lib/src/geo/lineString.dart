@@ -23,6 +23,18 @@ class LineString {
   }
 
   static bool validate(data) {
+    if (data['type'] != 'LineString' || !(data['coordinates'] is List)) {
+      return false;
+    }
+
+    List coordinates = data['coordinates'];
+    for (var i = 0; i < coordinates.length; i++) {
+      var point = coordinates[i];
+      if (!(point[0] is num && point[1] is num)) {
+        return false;
+      }
+    }
+
     return true;
   }
 

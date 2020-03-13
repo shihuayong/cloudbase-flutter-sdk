@@ -86,10 +86,10 @@ class Serializer {
 
       switch(type) {
         case 'Map':
-          docs['key'] = _formatMapField(value);
+          docs[key] = _formatMapField(value);
           break;
         case 'List':
-          docs['key'] = _formatListField(value);
+          docs[key] = _formatListField(value);
           break;
         case 'GeoPoint':
         case 'GeoLineString':
@@ -97,13 +97,13 @@ class Serializer {
         case 'GeoMultiPoint':
         case 'GeoMultiLineString':
         case 'GeoMultiPolygon':
-          docs['key'] = _formatGeoField(type, value);
+          docs[key] = _formatGeoField(type, value);
           break;
         case 'ServerDate':
-          docs['key'] = (DateTime.fromMicrosecondsSinceEpoch(value * 1000));
+          docs[key] = (DateTime.fromMicrosecondsSinceEpoch(value['\$date'] * 1000));
           break;
         default:
-          docs['key'] = value;
+          docs[key] = value;
           break;
       }
     });
@@ -152,7 +152,7 @@ class Serializer {
         return 'Timestamp';
       }
 
-      if (!data.containsKey('\$date')) {
+      if (data.containsKey('\$date')) {
         return 'ServerDate';
       }
 

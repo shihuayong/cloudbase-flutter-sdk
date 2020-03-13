@@ -23,6 +23,25 @@ class Polygon {
   }
 
   static bool validate(data) {
+    if (data['type'] != 'Polygon' || !(data['coordinates'] is List)) {
+      return false;
+    }
+
+    List polygon = data['coordinates'];
+    for (var i = 0; i < polygon.length; i++) {
+      if (!(polygon[i] is List)) {
+        return false;
+      }
+      List line = polygon[i];
+
+      for (var j = 0; j < line.length; j++) {
+        var point = line[j];
+        if (!(point[0] is num && point[1] is num)) {
+          return false;
+        }
+      }
+    }
+
     return true;
   }
 

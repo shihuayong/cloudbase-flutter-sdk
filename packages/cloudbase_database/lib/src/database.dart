@@ -1,6 +1,7 @@
 import 'package:cloudbase_core/cloudbase_core.dart';
 import 'package:cloudbase_database/src/geo.dart';
 import 'package:cloudbase_database/src/regexp.dart';
+import 'package:cloudbase_database/src/serverdate.dart';
 import './command.dart';
 import './collection.dart';
 
@@ -29,6 +30,10 @@ class CloudBaseDatabase {
 
   RegExp regExp(String regexp, [String options]) {
     return RegExp(regexp, options);
+  }
+
+  ServerDate serverDate([num offset]) {
+    return ServerDate(offset);
   }
 
 }

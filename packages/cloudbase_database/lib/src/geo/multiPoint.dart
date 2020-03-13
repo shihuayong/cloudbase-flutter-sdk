@@ -23,6 +23,18 @@ class MultiPoint {
   }
 
   static bool validate(data) {
+    if (data['type'] != 'MultiPoint' || !(data['coordinates'] is List)) {
+      return false;
+    }
+
+    List multiPoint = data['coordinates'];
+    for (var i = 0; i < multiPoint.length; i++) {
+      var point = multiPoint[i];
+      if (!(point[0] is num && point[1] is num)) {
+        return false;
+      }
+    }
+
     return true;
   }
 

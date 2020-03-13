@@ -6,7 +6,7 @@ class ServerDate {
   Map toJson() {
     return {
       '\$date': {
-        'offset': offset
+        'offset': offset == null ? 0 : offset
       }
     };
   }

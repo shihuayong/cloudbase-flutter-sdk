@@ -21,7 +21,11 @@ class Point {
   }
 
   static bool validate(data) {
-    return true;
+    return data['type'] == 'Point'
+        && data['coordinates'] is List
+        && Validater.isGeopoint('longitude', data['coordinates'][0])
+        && Validater.isGeopoint('latitude', data['coordinates'][1]);
+
   }
 
   static Point fromJson(coordinates) {
