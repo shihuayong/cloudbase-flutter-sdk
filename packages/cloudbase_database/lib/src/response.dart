@@ -1,4 +1,4 @@
-import 'package:cloudbase_core/cloudbase_core.dart';
+import 'dart:convert';
 
 class DbQueryResponse {
   String code;
@@ -19,6 +19,21 @@ class DbQueryResponse {
     this.limit,
     this.offset
   });
+
+  @override
+  String toString() {
+    var json = {
+      'code': code,
+      'message': message,
+      'data': data,
+      'requestId': requestId,
+      'total': total,
+      'limit': limit,
+      'offset': offset,
+    };
+
+    return jsonEncode(json);
+  }
 }
 
 class DbUpdateResponse {
@@ -36,6 +51,19 @@ class DbUpdateResponse {
     this.updateId,
     this.updated
   });
+
+  @override
+  String toString() {
+    var json = {
+      'code': code,
+      'message': message,
+      'requestId': requestId,
+      'updateId': updateId,
+      'updated': updated
+    };
+
+    return jsonEncode(json);
+  }
 }
 
 class DbRemoveResponse {
@@ -46,6 +74,18 @@ class DbRemoveResponse {
   dynamic deleted;
 
   DbRemoveResponse({this.code, this.message, this.requestId, this.deleted});
+
+  @override
+  String toString() {
+    var json = {
+      'code': code,
+      'message': message,
+      'requestId': requestId,
+      'deleted': deleted
+    };
+
+    return jsonEncode(json);
+  }
 }
 
 class DbCreateResponse {
@@ -56,4 +96,16 @@ class DbCreateResponse {
   String id;
 
   DbCreateResponse({this.code, this.message, this.requestId, this.id});
+
+  @override
+  String toString() {
+    var json = {
+      'code': code,
+      'message': message,
+      'requestId': requestId,
+      'id': id
+    };
+
+    return jsonEncode(json);
+  }
 }

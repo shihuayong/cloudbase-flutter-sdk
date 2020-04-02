@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloudbase_core/cloudbase_core.dart';
 import 'package:cloudbase_database/cloudbase_database.dart';
 import 'package:cloudbase_database/src/response.dart';
@@ -10,7 +12,7 @@ import 'case/intergace_geo_p0.dart' as geo_p0;
 void main() async {
 
   CloudBaseCore core = CloudBaseCore.init({'env': 'test-cloud-5f25f8'});
-
+  core.setAuthInstance(TestAuth());
   CloudBaseDatabase db = CloudBaseDatabase(core);
 
   /// collection p0用例
@@ -50,6 +52,51 @@ void main() async {
     expect(res2.code == null, true);
     expect(res2.data[0]['createTime'] is DateTime, true);
   });
+
+  /// 实时推送 p0用例
+  test(collection_p0.cases_data['name'], () async {
+    var collection = db.collection('tcb_hello_world');
+    // 单doc测试
+    RealtimeListener rl1 = collection.doc('f3db088f5e84cd1300409145374590ba').watch(onChange: (Snapshot snapshot) {
+      expect(snapshot.docs.length, 1);
+    }, onError: (error) {
+      expect(error, null);
+    });
+
+    // query测试
+    RealtimeListener rl2 = collection.where({'age': 18}).watch(onChange: (Snapshot snapshot) {
+      expect(snapshot.docs.length > 0, true);
+    }, onError: (error) {
+      expect(error, null);
+    });
+
+    // query + command 测试
+    RealtimeListener rl3 = collection.where({'age': db.command.gt(15)}).watch(onChange: (Snapshot snapshot) {
+      expect(snapshot.docs.length > 0, true);
+    }, onError: (error) {
+      expect(error, null);
+    });
+
+    // 等待10s,让watch处理完
+    await Future.delayed(Duration(seconds: 10), () {
+      rl1.close();
+      rl2.close();
+      rl3.close();
+    });
+  }, timeout: Timeout(Duration(seconds: 60)));
+}
+
+class TestAuth implements ICloudBaseAuth {
+  @override
+  Future<String> getAccessToken() async {
+    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoie1wiZW52TmFtZVwiOlwidGVzdC1jbG91ZC01ZjI1ZjhcIixcImxvZ2luVHlwZVwiOlwiQU5PTllNT1VTXCIsXCJ1dWlkXCI6XCJiMjkyODM2MzdhZTE0MjE2YWY2NzQxOGEzY2RiZTdkYlwifSIsImlhdCI6MTU4NzIxNTIxNywiZXhwIjoxNTg3MjE4ODE3fQ.LLuLJqbneRcWw1v7q1eo3z3b_uRmJkwWJVoDT2If5O8;1587206775';
+  }
+
+  @override
+  Future<CloudBaseAuthType> getAuthType() async {
+    return CloudBaseAuthType.ANONYMOUS;
+  }
+
 }
 
 Future<dynamic> collectionOp(CloudBaseDatabase db, String cmd, dynamic event) async {

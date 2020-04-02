@@ -1,4 +1,11 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:cloudbase_core/cloudbase_core.dart';
+import 'package:cloudbase_database/cloudbase_database.dart';
+import 'package:cloudbase_database/src/realtime/listener.dart';
+import 'package:cloudbase_database/src/realtime/snapshot.dart';
+import 'package:cloudbase_database/src/realtime/websocket_client.dart';
 import 'package:cloudbase_database/src/response.dart';
 import 'package:cloudbase_database/src/validater.dart';
 import './serializer.dart';
@@ -301,6 +308,26 @@ class Query {
         fieldFilters: _fieldFilters,
         fieldOrders: _fieldOrders,
         queryOptions: newOptions
+    );
+  }
+
+  RealtimeListener watch({
+    void onChange(Snapshot snapshot),
+    void onError(error)
+  }) {
+    Map<String, String> orderBy = {};
+    this._fieldOrders.forEach((order) {
+      orderBy[order.field] = order.direction;
+    });
+    
+    return RealtimeWebSocketClient.getInstance(this._core).watch(
+        envId: this._core.config.envId,
+        collectionName: this._coll,
+        query: jsonEncode(this._fieldFilters),
+        limit: min(this._queryOptions.limit ?? 0, 1000),
+        orderBy: orderBy,
+        onChange: onChange,
+        onError: onError
     );
   }
 

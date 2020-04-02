@@ -1,7 +1,13 @@
+import 'dart:convert';
+
 import 'package:cloudbase_core/cloudbase_core.dart';
 import 'package:cloudbase_database/src/command/update.dart';
+import 'package:cloudbase_database/src/realtime/listener.dart';
+import 'package:cloudbase_database/src/realtime/snapshot.dart';
+import 'package:cloudbase_database/src/realtime/websocket_client.dart';
 import 'package:cloudbase_database/src/response.dart';
 import 'package:cloudbase_database/src/serializer.dart';
+import 'package:cloudbase_database/src/database.dart';
 
 class Document {
   /// 上下文
@@ -251,6 +257,19 @@ class Document {
       coll: _coll,
       docId: _id,
       projection: newProjection
+    );
+  }
+
+  RealtimeListener watch({
+    void onChange(Snapshot snapshot),
+    void onError(error)
+  }) {
+    return RealtimeWebSocketClient.getInstance(this._core).watch(
+      envId: this._core.config.envId,
+      collectionName: this._coll,
+      query: jsonEncode({'_id': this._id}),
+      onChange: onChange,
+      onError: onError
     );
   }
 }
