@@ -42,7 +42,7 @@ packages:
       name: cloudbase_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.1"
+    version: "0.0.3"
   collection:
     dependency: transitive
     description:
