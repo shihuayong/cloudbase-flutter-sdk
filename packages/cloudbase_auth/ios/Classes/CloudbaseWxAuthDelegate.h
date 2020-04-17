@@ -6,6 +6,7 @@
   FlutterResult _callback;
   
   id<AspectToken> _hookOpenUrl;
+  id<AspectToken> _hookOpenUrlWithOptions;
   id<AspectToken> _hookHandleOpenUrl;
   id<AspectToken> _hookContinueUserActivity;
 };
