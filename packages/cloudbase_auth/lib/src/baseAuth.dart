@@ -36,6 +36,7 @@ class AuthProvider implements ICloudBaseAuth {
     await cache.setStore(cache.refreshTokenKey, refreshToken);
   }
 
+  @override
   Future<void> refreshAccessToken() async {
     /// 可能会同时调用多次刷新access token，这里把它们合并成一个
     if (this._refreshAccessTokenFuture == null) {
@@ -86,9 +87,8 @@ class AuthProvider implements ICloudBaseAuth {
       /// 匿名登录refresh_token过期情况下返回refresh_token
       /// 此场景下使用新的refresh_token获取access_token
       if (res.data['refresh_token'] != null) {
-        await cache.removeStore(cache.refreshTokenKey);
-        await cache.setStore(cache.refreshTokenKey, res.data['refresh_token']);
-        this._refreshAccessToken();
+        await this.setRefreshToken(res.data['refresh_token']);
+        await this._refreshAccessToken();
       }
     }
   }

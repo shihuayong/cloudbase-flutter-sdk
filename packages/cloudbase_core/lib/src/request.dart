@@ -32,6 +32,12 @@ class CloudBaseRequest {
   /// 发送请求，携带 accessToken
   Future<CloudBaseResponse> post(
       String action, Map<String, dynamic> data) async {
+
+    /// 如果没有注入auth对象, 则使用未登录模式调用请求
+    if (_auth == null) {
+      return await this.postWithoutAuth(action, data);
+    }
+
     // 获取 accesstoken
     String accessToken = await _auth.getAccessToken();
 
@@ -44,6 +50,11 @@ class CloudBaseRequest {
     });
 
     final Response response = await _dio.post(_TCB_WEB_URL, data: data);
+
+    if (response.data['code'] == 'ACCESS_TOKEN_EXPIRED') {
+      await _auth.refreshAccessToken();
+      return await this.post(action, data);
+    }
 
     // 从 HTTP 响应 data 中解析数据
     return CloudBaseResponse.fromMap(response.data);

@@ -81,7 +81,6 @@ class CloudBaseCore {
 
   CloudBaseCore._internal(CloudBaseConfig config) {
     this.config = config;
-    auth = CloudBaseEmptyAuth(this);
   }
 
   factory CloudBaseCore(CloudBaseConfig config) {
