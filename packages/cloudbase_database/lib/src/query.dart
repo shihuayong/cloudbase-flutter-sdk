@@ -189,7 +189,7 @@ class Query {
   }
 
   Future<DbRemoveResponse> remove() async {
-    if (_queryOptions !=  null) {
+    if (_queryOptions.offset !=  null || _queryOptions.limit != null || _queryOptions.projection != null) {
       return DbRemoveResponse(
         code: CloudBaseExceptionCode.INVALID_PARAM,
         message: '`offset`, `limit` and `projection` are not supported in remove() operation'

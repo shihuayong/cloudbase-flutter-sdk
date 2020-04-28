@@ -1,6 +1,6 @@
 name: cloudbase_database
 description: Flutter plugin for cloudbase database.
-version: 0.0.7
+version: 0.0.8
 homepage: https://github.com/TencentCloudBase
 
 environment:
