@@ -53,7 +53,10 @@ class _TestPage extends State<TestPage> {
       // 初始化实例
       CloudBaseStorage storage = CloudBaseStorage(_core);
       CloudBaseStorageRes<UploadRes> res = await storage.uploadFile(
-          cloudPath: 'flutter/data.txt', filePath: filePath);
+          cloudPath: 'flutter/data.txt', filePath: filePath, onProcess: (count, total) {
+            print(count);
+            print(total);
+          });
       print('上传文件完成');
       assert(res.data.fileId.isNotEmpty);
     });
@@ -64,7 +67,10 @@ class _TestPage extends State<TestPage> {
       // 初始化实例
       CloudBaseStorage storage = CloudBaseStorage(_core);
       String fileId = 'cloud://zdev.7a64-zdev-1252710547/flutter/data.txt';
-      await storage.downloadFile(fileId: fileId, savePath: savePath);
+      await storage.downloadFile(fileId: fileId, savePath: savePath, onProcess: (count, total) {
+        print(count);
+        print(total);
+      });
       print('下载文件完成');
     });
 

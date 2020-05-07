@@ -84,6 +84,7 @@ class CloudBaseRequest {
     String url,
     String filePath,
     Map<String, dynamic> metadata,
+    void onProcess(int count, int total)
   }) async {
     if (filePath == null) {
       throw new CloudBaseException(
@@ -97,10 +98,10 @@ class CloudBaseRequest {
     data.addAll(metadata);
     data.addAll({"file": await MultipartFile.fromFile(filePath)});
     FormData formData = FormData.fromMap(data);
-    await _dio.post(url, data: formData);
+    await _dio.post(url, data: formData, onSendProgress: onProcess);
   }
 
-  download(String url, String savePath) async {
-    await _dio.download(url, savePath);
+  download(String url, String savePath, void onProcess(int count, int total)) async {
+    await _dio.download(url, savePath, onReceiveProgress: onProcess);
   }
 }

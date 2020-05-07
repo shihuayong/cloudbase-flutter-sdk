@@ -9,7 +9,7 @@ class CloudBaseStorage {
   }
 
   /// 上传文件
-  uploadFile({String cloudPath, String filePath}) async {
+  uploadFile({String cloudPath, String filePath, void onProcess(int count, int total)}) async {
     _checkParams(cloudPath, 'cloudPath is required');
     _checkParams(filePath, 'filePath is required');
 
@@ -26,7 +26,7 @@ class CloudBaseStorage {
 
     // 上传文件，正常的情况响应为空
     await _request.postFileByFormData(
-        url: metadata.url, metadata: data, filePath: filePath);
+        url: metadata.url, metadata: data, filePath: filePath, onProcess: onProcess);
 
     CloudBaseStorageRes<UploadRes> res = CloudBaseStorageRes(
         requestId: metadataRes.requestId,
@@ -35,7 +35,7 @@ class CloudBaseStorage {
   }
 
   /// 下载文件
-  Future<void> downloadFile({String fileId, String savePath}) async {
+  Future<void> downloadFile({String fileId, String savePath, void onProcess(int count, int total)}) async {
     _checkParams("fileId", "fileId required");
 
     List<String> fileIds = [fileId];
@@ -47,7 +47,7 @@ class CloudBaseStorage {
           code: CloudBaseExceptionCode.FILE_NOT_EXIST,
           message: 'File Not Exist');
     }
-    await _request.download(url, savePath);
+    await _request.download(url, savePath, onProcess);
   }
 
   /// 删除文件
