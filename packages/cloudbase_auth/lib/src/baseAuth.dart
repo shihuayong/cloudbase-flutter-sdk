@@ -44,8 +44,13 @@ class AuthProvider implements ICloudBaseAuth {
       this._refreshAccessTokenFuture = this._refreshAccessToken();
     }
 
-    await this._refreshAccessTokenFuture;
-    this._refreshAccessTokenFuture = null;
+    try {
+      await this._refreshAccessTokenFuture;
+    } catch (e) {
+      throw e;
+    } finally {
+      this._refreshAccessTokenFuture = null;
+    }
   }
 
   Future<void> _refreshAccessToken() async {

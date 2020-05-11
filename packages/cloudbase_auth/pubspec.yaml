@@ -1,6 +1,6 @@
 name: cloudbase_auth
 description: Flutter plugin for cloudbase auth.
-version: 0.0.6
+version: 0.0.7
 homepage: https://www.cloudbase.net
 
 environment:
