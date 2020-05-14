@@ -1,3 +1,5 @@
+import 'package:cloudbase_core/src/trace.dart';
+
 import './exception.dart';
 import './auth.dart';
 
@@ -13,7 +15,10 @@ class CloudBaseConfig {
   String wxAppId;
   String wxUniLink;
 
-  CloudBaseConfig({this.env, this.envId, this.timeout, this.wxAppId, this.wxUniLink}) {
+  /// 应用安全校验密钥
+  Map<String, String> appAccess;
+
+  CloudBaseConfig({this.env, this.envId, this.timeout, this.wxAppId, this.wxUniLink, this.appAccess}) {
     assert(env != null || envId != null);
 
     _adapt();
@@ -21,14 +26,16 @@ class CloudBaseConfig {
 
   CloudBaseConfig.fromMap(Map<String, dynamic> map) {
     timeout = map['timeout'];
-    envId = map['envId'];
-    env = map['env'];
     wxAppId = map['wxAppId'];
     wxUniLink = map['wxUniLink'];
 
+    envId = map['envId'];
+    env = map['env'];
     assert(env != null || envId != null);
-
     _adapt();
+
+    appAccess = map['appAccess'];
+    assert(appAccess != null);
   }
 
   void _adapt() {
@@ -103,8 +110,14 @@ class CloudBaseCore {
     if (envId == null && _cache[envId] == null) {
       throw new CloudBaseException(
           code: CloudBaseExceptionCode.INVALID_PARAM,
-          message: '环境 $envId 未初始化 CloudBaseCore 实例，请传入 envId');
+          message: 'CloudBase 初始化实例失败，缺少参数 env');
     }
+
+    if (map['appAccess'] == null && _cache[envId] == null) {
+      throw new CloudBaseException(
+        code: CloudBaseExceptionCode.INVALID_PARAM,
+        message: 'CloudBase 初始化实例失败，缺少参数 appAccess. 如果没有 appAccess, 请到云开发控制台设置移动安全来源.');
+    } 
 
     return _cache.putIfAbsent(envId, () {
       CloudBaseConfig config = CloudBaseConfig.fromMap(map);

@@ -2,10 +2,12 @@ import 'package:cloudbase_core/src/exception.dart';
 import 'package:dio/dio.dart';
 import './auth.dart';
 import './base.dart';
+import './sign.dart';
+import './trace.dart';
 
 const int _TCB_DEFAULT_TIMEOUT = 15000;
-const String _VERSION = '0.0.1';
-const String _DATA_VERSION = '2019-06-01';
+const String _VERSION = '0.0.2';
+const String _DATA_VERSION = '2020-01-05';
 const String _TCB_WEB_URL = 'https://tcb-api.tencentcloudapi.com/web';
 
 class CloudBaseRequest {
@@ -49,7 +51,8 @@ class CloudBaseRequest {
       'access_token': accessToken
     });
 
-    final Response response = await _dio.post(_TCB_WEB_URL, data: data);
+    data = await Sign.signData(_core, data);
+    final Response response = await _tracePost(_TCB_WEB_URL, data);
 
     if (response.data['code'] == 'ACCESS_TOKEN_EXPIRED') {
       await _auth.refreshAccessToken();
@@ -70,13 +73,25 @@ class CloudBaseRequest {
       'dataVersion': _DATA_VERSION
     });
 
-    final Response response = await _dio.post(_TCB_WEB_URL, data: data);
+    data = await Sign.signData(_core, data);
+    final Response response = await _tracePost(_TCB_WEB_URL, data);
     return CloudBaseResponse.fromMap({
       'code': response.data['code'],
       'data': response.data,
       'message': response.data['message'],
       'requestId': response.data['requestId']
     });
+  }
+
+  Future<Response> _tracePost(String path, data) async {
+    /// 添加 trace header
+    await Trace(_core).addTrace(_dio);
+    /// dio post
+    final Response response = await _dio.post(path, data: data);
+    /// 更新 trace header
+    await Trace(_core).updateTrace(response);
+
+    return response;
   }
 
   /// 使用 form 表单传递文件

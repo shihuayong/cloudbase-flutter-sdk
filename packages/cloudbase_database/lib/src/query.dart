@@ -79,8 +79,7 @@ class Query {
     params.addAll({
       'collectionName': this._coll,
       'queryType': 'WHERE',
-      'databaseMidTran': true,
-      'dataVersion': '2019-06-01'
+      'databaseMidTran': true
     });
 
     return _request.post(action, params);
