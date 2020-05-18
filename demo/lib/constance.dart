@@ -20,5 +20,9 @@ const MainColor = const Color(0xff006eff);
 const baseConfig = {
   'env': 'test-cloud-5f25f8',
   'wxAppId': 'wx83757a683cf405fe', 
-  'wxUniLink': 'https://test-cloud-5f25f8.tcloudbaseapp.com/'
+  'wxUniLink': 'https://test-cloud-5f25f8.tcloudbaseapp.com/',
+  'appAccess': {
+    'key': '12da3987af425dad5d9e69452bacc90a',
+    'version': "1"
+  }
 };
