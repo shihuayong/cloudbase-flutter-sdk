@@ -23,7 +23,7 @@ class CloudBaseRequest {
     _dio = Dio(BaseOptions(
         headers: {
           'Connection': 'Keep-Alive',
-          'User-Agent': 'cloudbase-flutter-sdk/0.0.1'
+          'User-Agent': 'cloudbase-flutter-sdk/0.0.2'
         },
         contentType: 'application/json',
         responseType: ResponseType.json,

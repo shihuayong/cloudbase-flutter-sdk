@@ -114,13 +114,16 @@ class _TestPage extends State<TestPage> {
   }
 
   _wxLogin() async {
-    CloudBaseAuth auth = CloudBaseWxAuth(_core);
-    if (await auth.isLogin()) {
+    CloudBaseAuth auth = CloudBaseAuth(_core);
+    CloudBaseAuthState authState = await auth.getAuthState().catchError((e) {
+      _text = e.toString();
+    });
+    if (authState != null && authState.authType == CloudBaseAuthType.WX) {
       setState(() {
         _text = '微信已登录';
       });
     } else {
-      await auth.login().then((success) {
+      await auth.signInByWx(wxAppId: "wx83757a683cf405fe", wxUniLink: "https://test-cloud-5f25f8.tcloudbaseapp.com/").then((success) {
         setState(() {
           _text = '微信登录成功';
         });
@@ -138,6 +141,8 @@ class _TestPage extends State<TestPage> {
     CloudBaseAuthState authState = await auth.getAuthState().catchError((e) {
       _text = e.toString();
     });
+
+    bool isExpired = await auth.hasExpiredAuthState();
 
     if (authState != null && authState.authType == CloudBaseAuthType.ANONYMOUS) {
       setState(() {
@@ -218,7 +223,7 @@ class _TestPage extends State<TestPage> {
   }
 
   _callFunctionTest() async {
-    CloudBaseWxAuth(_core);
+    CloudBaseAuth(_core);
     CloudBaseFunction cloudbaseFunc = CloudBaseFunction(_core);
 
     test('callFunction 参数', () async {
@@ -244,7 +249,7 @@ class _TestPage extends State<TestPage> {
   }
 
   _fileTest() {
-    CloudBaseWxAuth(_core);
+    CloudBaseAuth(_core);
     _testFile();
   }
 

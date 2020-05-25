@@ -4,9 +4,10 @@ import 'cache.dart';
 import 'package:cloudbase_core/cloudbase_core.dart';
 
 class AuthProvider implements ICloudBaseAuth {
+  static Future<void> _refreshAccessTokenFuture;
+
   AuthCache _cache;
   CloudBaseCore _core;
-  Future<void> _refreshAccessTokenFuture;
   CloudBaseAuthType _authType;
 
   AuthProvider(CloudBaseCore core) {
@@ -34,22 +35,24 @@ class AuthProvider implements ICloudBaseAuth {
     await cache.removeStore(cache.accessTokenKey);
     await cache.removeStore(cache.accessTokenExpireKey);
     await cache.setStore(cache.refreshTokenKey, refreshToken);
+    /// refresh token 30天后过期
+    await cache.setStore(cache.refreshTokenExpireKey, DateTime.now().add(Duration(days: 30)).millisecondsSinceEpoch);
   }
 
   @override
   Future<void> refreshAccessToken() async {
     /// 可能会同时调用多次刷新access token，这里把它们合并成一个
-    if (this._refreshAccessTokenFuture == null) {
+    if (AuthProvider._refreshAccessTokenFuture == null) {
       /// 没有正在刷新，那么正常执行刷新逻辑
-      this._refreshAccessTokenFuture = this._refreshAccessToken();
+      AuthProvider._refreshAccessTokenFuture = this._refreshAccessToken();
     }
 
     try {
-      await this._refreshAccessTokenFuture;
+      await AuthProvider._refreshAccessTokenFuture;
     } catch (e) {
       throw e;
     } finally {
-      this._refreshAccessTokenFuture = null;
+      AuthProvider._refreshAccessTokenFuture = null;
     }
   }
 
@@ -117,6 +120,23 @@ class AuthProvider implements ICloudBaseAuth {
 
   @override
   Future<String> getAccessToken() async {
+    /// 如果正在刷新token，则等待
+    if (AuthProvider._refreshAccessTokenFuture != null) {
+      await AuthProvider._refreshAccessTokenFuture;
+    }
+
+    String accessToken = await cache.getStore(cache.accessTokenKey);
+    int accessTokenExpired = await cache.getStore(cache.accessTokenExpireKey);
+
+    if (accessToken != null && accessTokenExpired != null 
+      && accessTokenExpired > DateTime.now().millisecondsSinceEpoch) {
+      
+      return accessToken;
+    }
+
+    /// 如果accessToken无效，则刷新
+    await refreshAccessToken();
+
     return await cache.getStore(cache.accessTokenKey);
   }
 }

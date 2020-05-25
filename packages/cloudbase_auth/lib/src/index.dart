@@ -12,8 +12,19 @@ class CloudBaseAuth extends AuthProvider {
   CustomAuthProvider _customAuthProvider;
   AnonymousAuthProvider _anonymousAuthProvider;
 
-  CloudBaseAuth(CloudBaseCore core) : super(core) {
+  CloudBaseAuth._internal(CloudBaseCore core) : super(core) {
     super.core.setAuthInstance(this);
+  }
+
+  /// 缓存 auth 实例
+  static final Map<String, CloudBaseAuth> _cache = <String, CloudBaseAuth>{};
+
+  factory CloudBaseAuth(CloudBaseCore core) {
+    String envId = core.config.env;
+
+    return _cache.putIfAbsent(envId, () {
+      return CloudBaseAuth._internal(core);
+    });
   }
 
   /// 微信登录
@@ -79,6 +90,7 @@ class CloudBaseAuth extends AuthProvider {
     }
 
     await cache.removeStore(cache.refreshTokenKey);
+    await cache.removeStore(cache.refreshTokenExpireKey);
     await cache.removeStore(cache.accessTokenKey);
     await cache.removeStore(cache.accessTokenExpireKey);
 
@@ -87,22 +99,38 @@ class CloudBaseAuth extends AuthProvider {
 
   /// 获取登录状态
   Future<CloudBaseAuthState> getAuthState() async {
-    try {
-      await refreshAccessToken();
-    } catch (e) {
-      return null;
-    }
+    String refreshToken = await cache.getStore(cache.refreshTokenKey);
+    int refreshTokenExpire = await cache.getStore(cache.refreshTokenExpireKey);
+    if (refreshToken != null && 
+        refreshToken.isNotEmpty &&
+        refreshTokenExpire != null &&
+        refreshTokenExpire > DateTime.now().millisecondsSinceEpoch) {
 
-    String accessToken = await cache.getStore(cache.accessTokenKey);
-    if (accessToken != null && accessToken.isNotEmpty) {
       return CloudBaseAuthState(
         authType: await cache.getStore(cache.loginTypeKey),
-        refreshToken: await cache.getStore(cache.refreshTokenKey),
-        accessToken: accessToken
+        refreshToken: refreshToken,
+        accessToken: await cache.getStore(cache.accessTokenKey)
       );
     }
 
     return null;
+  }
+
+  /// 是否存在已经过期的登录态
+  /// 在getAuthStateh获得null以后，可以通过这个接口进一步区分 "没有登录态" 和 "登录态已过期"
+  Future<bool> hasExpiredAuthState() async {
+    String refreshToken = await cache.getStore(cache.refreshTokenKey);
+    int refreshTokenExpire = await cache.getStore(cache.refreshTokenExpireKey);
+
+    if (refreshToken != null && 
+        refreshToken.isNotEmpty &&
+        refreshTokenExpire != null &&
+        refreshTokenExpire < DateTime.now().millisecondsSinceEpoch) {
+
+      return true;
+    }
+
+    return false;
   }
 
   /// 获取用户信息
@@ -121,50 +149,4 @@ class CloudBaseAuth extends AuthProvider {
 
     return CloudBaseUserInfo(res.data);
   }
-
-  Future<bool> isLogin() {
-    /// throw error
-  }
-
-  Future<bool> login() {
-    /// throw error
-  }
-}
-
-class CloudBaseWxAuth extends CloudBaseAuth {
-  CloudBaseCore _core;
-
-  /// 不再推荐使用CloudBaseWxAuth，会在后续版本废弃
-  /// 推荐直接使用CloudBaseAuth
-  CloudBaseWxAuth(CloudBaseCore core) : super(core) {
-    _core = super.core;
-    assert(_core != null);
-    assert(_core.config.wxAppId != null && _core.config.wxAppId.isNotEmpty);
-    assert(_core.config.wxUniLink != null && _core.config.wxUniLink.isNotEmpty);
-    _core.setAuthInstance(this);
-  }
-
-  @override
-  Future<bool> login() async {
-    await super.signInByWx(
-        wxAppId: _core.config.wxAppId,
-        wxUniLink: _core.config.wxUniLink
-    );
-
-    return true;
-  }
-
-  @override
-  Future<bool> isLogin() async {
-    bool isLogin = false;
-
-    CloudBaseAuthState authState = await getAuthState();
-
-    if (authState != null && authState.authType == CloudBaseAuthType.WX) {
-      isLogin = true;
-    }
-
-    return isLogin;
-  }
-
 }

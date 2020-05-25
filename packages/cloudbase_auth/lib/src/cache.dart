@@ -4,6 +4,7 @@ class AuthConstant {
   static const String ACCESS_TOKEN = 'access_token';
   static const String ACCESS_TOKEN_EXPIRE = 'access_token_expire';
   static const String REFRESH_TOKEN = 'refresh_token';
+  static const String REFRESH_TOKEN_EXPIRE = 'refresh_token_expire';
   static const String ANONYMOUS_UUID = 'anonymous_uuid';
   static const String LOGIN_TYPE = 'login_type';
 }
@@ -12,12 +13,13 @@ class AuthCache {
   final String accessTokenKey;
   final String accessTokenExpireKey;
   final String refreshTokenKey;
+  final String refreshTokenExpireKey;
   final String anonymousUuidKey;
   final String loginTypeKey;
 
   CloudBaseStore _store;
 
-  AuthCache({this.accessTokenKey, this.accessTokenExpireKey, this.refreshTokenKey, this.anonymousUuidKey, this.loginTypeKey});
+  AuthCache({this.accessTokenKey, this.accessTokenExpireKey, this.refreshTokenKey, this.refreshTokenExpireKey, this.anonymousUuidKey, this.loginTypeKey});
 
   factory AuthCache.init(CloudBaseConfig config) {
     assert(config != null && config.envId != null && config.envId.isNotEmpty);
@@ -28,6 +30,7 @@ class AuthCache {
       accessTokenKey: '${envId}_${AuthConstant.ACCESS_TOKEN}',
       accessTokenExpireKey: '${envId}_${AuthConstant.ACCESS_TOKEN_EXPIRE}',
       refreshTokenKey: '${envId}_${AuthConstant.REFRESH_TOKEN}',
+      refreshTokenExpireKey: '${envId}_${AuthConstant.REFRESH_TOKEN_EXPIRE}',
       anonymousUuidKey: '${envId}_${AuthConstant.ANONYMOUS_UUID}',
       loginTypeKey: '${envId}_${AuthConstant.LOGIN_TYPE}',
     );

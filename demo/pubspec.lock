@@ -56,28 +56,28 @@ packages:
       name: cloudbase_auth
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.2"
+    version: "0.0.10"
   cloudbase_core:
     dependency: "direct main"
     description:
       name: cloudbase_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.2"
+    version: "0.0.8"
   cloudbase_function:
     dependency: "direct main"
     description:
       name: cloudbase_function
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.1"
+    version: "0.0.2"
   cloudbase_storage:
     dependency: "direct main"
     description:
       name: cloudbase_storage
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.1"
+    version: "0.0.3"
   collection:
     dependency: transitive
     description:
@@ -299,6 +299,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
+  package_info:
+    dependency: transitive
+    description:
+      name: package_info
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.0+18"
   package_resolver:
     dependency: transitive
     description:
@@ -558,4 +565,4 @@ packages:
     version: "2.2.0"
 sdks:
   dart: ">=2.6.0 <3.0.0"
-  flutter: ">=1.12.13+hotfix.4 <2.0.0"
+  flutter: ">=1.12.13+hotfix.5 <2.0.0"
