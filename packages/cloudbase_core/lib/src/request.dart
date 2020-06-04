@@ -7,7 +7,7 @@ import './trace.dart';
 
 const int _TCB_DEFAULT_TIMEOUT = 15000;
 const String _VERSION = '0.0.2';
-const String _DATA_VERSION = '2020-01-05';
+const String _DATA_VERSION = '2020-06-01';
 const String _TCB_WEB_URL = 'https://tcb-api.tencentcloudapi.com/web';
 
 class CloudBaseRequest {
@@ -23,7 +23,8 @@ class CloudBaseRequest {
     _dio = Dio(BaseOptions(
         headers: {
           'Connection': 'Keep-Alive',
-          'User-Agent': 'cloudbase-flutter-sdk/0.0.2'
+          'User-Agent': 'cloudbase-flutter-sdk/0.0.2',
+          'X-SDK-Version': 'cloudbase-flutter-sdk/0.0.2'
         },
         contentType: 'application/json',
         responseType: ResponseType.json,

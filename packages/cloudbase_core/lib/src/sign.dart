@@ -29,7 +29,7 @@ class Sign {
       var newData = Map<String, dynamic>();
       newData.addAll(data);
       newData['timestamp'] = timestamp;
-      newData['appAccessKey'] = secret;
+      newData['appAccessKeyId'] = version;
       newData['appSign'] = appSign;
       newData['sign'] = sign;
 
