@@ -43,7 +43,7 @@ class CloudBaseUserInfo {
   String avatarUrl;
 
   CloudBaseUserInfo(map) {
-    uuid = map['uuid'];
+    uuid = map['uid'];
     env = map['envName'];
     loginType = map['loginType'];
     appid = map['appid'];
