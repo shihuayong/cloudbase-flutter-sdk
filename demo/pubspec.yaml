@@ -19,10 +19,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cloudbase_core: ^0.0.8
-  cloudbase_auth: ^0.0.10
+  cloudbase_core: ^0.0.9
+  cloudbase_auth: ^0.0.11
   cloudbase_function: ^0.0.2
   cloudbase_storage: ^0.0.3
+  cloudbase_database: ^0.0.10
   path_provider: ^1.5.1
 
   file_picker: ^1.4.3+2
