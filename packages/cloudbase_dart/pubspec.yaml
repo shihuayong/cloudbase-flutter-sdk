@@ -1,6 +1,6 @@
 name: cloudbase_dart
 description: Dart plugin for cloudbase.
-version: 0.0.3
+version: 0.0.4
 homepage: https://www.cloudbase.net/
 
 environment:
