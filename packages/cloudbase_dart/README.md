@@ -10,7 +10,7 @@
 
 ```yaml
 dependencies:
-  cloudbase_dart: ^0.0.4
+  cloudbase_dart: ^0.0.5
 ```
 
 ## 简单示例
