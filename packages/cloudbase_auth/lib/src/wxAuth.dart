@@ -9,19 +9,21 @@ class WxAuthProvider extends AuthProvider {
 
   WxAuthProvider(CloudBaseCore core) : super(core);
 
-  Future<CloudBaseAuthState> signInByWx(String wxAppId, String wxUniLink) async {
+  Future<CloudBaseAuthState> signInByWx(
+      String wxAppId, String wxUniLink) async {
     if (wxAppId == null || wxUniLink == null) {
       throw CloudBaseException(
-        code: CloudBaseExceptionCode.EMPTY_PARAM,
-        message: "wxAppid or wxUniLink is null"
-      );
+          code: CloudBaseExceptionCode.EMPTY_PARAM,
+          message: "wxAppid or wxUniLink is null");
     }
 
     String code = await _getWxCode(wxAppId, wxUniLink);
-    CloudBaseResponse res = await CloudBaseRequest(super.core).postWithoutAuth('auth.getJwt', {
+    CloudBaseResponse res = await CloudBaseRequest(super.core).postWithoutAuth(
+        'auth.getJwt', {
       'appid': wxAppId,
       'loginType': 'WECHAT-OPEN',
-      'code': code
+      'code': code,
+      'syncUserInfo': true
     });
 
     if (res == null) {
@@ -39,44 +41,38 @@ class WxAuthProvider extends AuthProvider {
       await setRefreshToken(refreshToken);
       await setAuthType(CloudBaseAuthType.WX);
 
-      if (res.data['access_token'] != null && res.data['access_token_expire'] != null) {
+      if (res.data['access_token'] != null &&
+          res.data['access_token_expire'] != null) {
         await cache.setStore(cache.accessTokenKey, res.data['access_token']);
-        await cache.setStore(cache.accessTokenExpireKey, res.data["access_token_expire"]+DateTime.now().millisecondsSinceEpoch);
+        await cache.setStore(
+            cache.accessTokenExpireKey,
+            res.data["access_token_expire"] +
+                DateTime.now().millisecondsSinceEpoch);
       } else {
         await refreshAccessToken();
       }
 
       return CloudBaseAuthState(
-          authType: CloudBaseAuthType.WX,
-          refreshToken: refreshToken
-      );
+          authType: CloudBaseAuthType.WX, refreshToken: refreshToken);
     } else {
       throw CloudBaseException(
-        code: CloudBaseExceptionCode.AUTH_FAILED,
-        message: '微信登录失败'
-      );
+          code: CloudBaseExceptionCode.AUTH_FAILED, message: '微信登录失败');
     }
   }
 
   Future<String> _getWxCode(String wxAppId, String wxUniLink) async {
     // 1.wx app register
-    var params = {
-      'wxAppId': wxAppId,
-      'wxUniLink': wxUniLink
-    };
+    var params = {'wxAppId': wxAppId, 'wxUniLink': wxUniLink};
     await _channel.invokeMethod('wxauth.register', params).catchError((e) {
       throw CloudBaseException(
-          code: CloudBaseExceptionCode.AUTH_FAILED,
-          message: e.toString()
-      );
+          code: CloudBaseExceptionCode.AUTH_FAILED, message: e.toString());
     });
 
     // 2.wx app login
-    final String code = await _channel.invokeMethod('wxauth.login').catchError((e) {
+    final String code =
+        await _channel.invokeMethod('wxauth.login').catchError((e) {
       throw CloudBaseException(
-          code: CloudBaseExceptionCode.AUTH_FAILED,
-          message: e.message
-      );
+          code: CloudBaseExceptionCode.AUTH_FAILED, message: e.message);
     });
 
     return code;
