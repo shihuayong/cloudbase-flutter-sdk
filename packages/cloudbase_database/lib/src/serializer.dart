@@ -37,6 +37,10 @@ class Serializer {
       return list;
     }
 
+    if (data is DateTime) {
+      return {'\$date': data.microsecondsSinceEpoch};
+    }
+
     return data;
   }
 
@@ -50,7 +54,7 @@ class Serializer {
     documents.forEach((item) {
       String type = _whichType(item);
 
-      switch(type) {
+      switch (type) {
         case 'Map':
           docs.add(_formatMapField(item));
           break;
@@ -84,7 +88,7 @@ class Serializer {
     documents.forEach((key, value) {
       String type = _whichType(value);
 
-      switch(type) {
+      switch (type) {
         case 'Map':
           docs[key] = _formatMapField(value);
           break;
@@ -100,7 +104,8 @@ class Serializer {
           docs[key] = _formatGeoField(type, value);
           break;
         case 'ServerDate':
-          docs[key] = (DateTime.fromMicrosecondsSinceEpoch(value['\$date'] * 1000));
+          docs[key] =
+              (DateTime.fromMicrosecondsSinceEpoch(value['\$date'] * 1000));
           break;
         default:
           docs[key] = value;
@@ -112,7 +117,7 @@ class Serializer {
   }
 
   static dynamic _formatGeoField(type, document) {
-    switch(type) {
+    switch (type) {
       case 'GeoPoint':
         return Point.fromJson(document['coordinates']);
       case 'GeoLineString':
@@ -167,7 +172,6 @@ class Serializer {
       if (Polygon.validate(data)) {
         return 'GeoPolygon';
       }
-
 
       if (MultiPoint.validate(data)) {
         return 'GeoMultiPoint';
