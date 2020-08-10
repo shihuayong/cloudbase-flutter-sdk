@@ -13,9 +13,6 @@ enum CloudBaseAuthType {
 }
 
 abstract class ICloudBaseAuth {
-  /// 获取 authType
-  Future<CloudBaseAuthType> getAuthType();
-
   /// 获取 accessToken
   Future<String> getAccessToken();
 

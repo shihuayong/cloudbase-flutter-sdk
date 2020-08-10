@@ -19,7 +19,13 @@ class AuthCache {
 
   CloudBaseStore _store;
 
-  AuthCache({this.accessTokenKey, this.accessTokenExpireKey, this.refreshTokenKey, this.refreshTokenExpireKey, this.anonymousUuidKey, this.loginTypeKey});
+  AuthCache(
+      {this.accessTokenKey,
+      this.accessTokenExpireKey,
+      this.refreshTokenKey,
+      this.refreshTokenExpireKey,
+      this.anonymousUuidKey,
+      this.loginTypeKey});
 
   factory AuthCache.init(CloudBaseConfig config) {
     assert(config != null && config.envId != null && config.envId.isNotEmpty);
@@ -44,7 +50,7 @@ class AuthCache {
 
     if (key == this.loginTypeKey) {
       int index = await _store.get(key);
-      return CloudBaseAuthType.values[index];
+      return index != null ? CloudBaseAuthType.values[index] : null;
     } else {
       return _store.get(key);
     }
@@ -70,5 +76,14 @@ class AuthCache {
     }
 
     return _store.remove(key);
+  }
+
+  /// 删除所有缓存
+  Future<dynamic> removeAllStore() async {
+    if (_store == null) {
+      _store = await CloudBaseStore().init();
+    }
+
+    return _store.clear();
   }
 }

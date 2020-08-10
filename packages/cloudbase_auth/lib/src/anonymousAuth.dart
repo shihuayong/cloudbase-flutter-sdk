@@ -10,9 +10,12 @@ class AnonymousAuthProvider extends AuthProvider {
     /// 如果本地存有uuid则匿名登录时传给server
     String uuid = await cache.getStore(cache.anonymousUuidKey);
     String refreshToken = await cache.getStore(cache.refreshTokenKey);
-    CloudBaseResponse res = await CloudBaseRequest(super.core).postWithoutAuth('auth.signInAnonymously', {
+    CloudBaseAuthType loginType = await cache.getStore(cache.loginTypeKey);
+    CloudBaseResponse res = await CloudBaseRequest(super.core)
+        .postWithoutAuth('auth.signInAnonymously', {
       'anonymous_uuid': uuid,
-      'refresh_token': refreshToken
+      'refresh_token': refreshToken,
+      'currLoginType': loginType?.index
     });
 
     if (res == null) {
@@ -25,7 +28,9 @@ class AnonymousAuthProvider extends AuthProvider {
       throw new CloudBaseException(code: res.code, message: res.message);
     }
 
-    if (res.data != null && res.data['refresh_token'] != null && res.data['uuid'] != null) {
+    if (res.data != null &&
+        res.data['refresh_token'] != null &&
+        res.data['uuid'] != null) {
       String newUuid = res.data['uuid'];
       String newRefreshToken = res.data['refresh_token'];
       await _setAnonymousUUID(newUuid);
@@ -33,14 +38,10 @@ class AnonymousAuthProvider extends AuthProvider {
       await refreshAccessToken();
 
       return CloudBaseAuthState(
-          authType: CloudBaseAuthType.ANONYMOUS,
-          refreshToken: newRefreshToken
-      );
+          authType: CloudBaseAuthType.ANONYMOUS, refreshToken: newRefreshToken);
     } else {
       throw CloudBaseException(
-        code: CloudBaseExceptionCode.AUTH_FAILED,
-        message: '匿名登录失败'
-      );
+          code: CloudBaseExceptionCode.AUTH_FAILED, message: '匿名登录失败');
     }
   }
 
@@ -48,7 +49,8 @@ class AnonymousAuthProvider extends AuthProvider {
   Future<void> linkAndRetrieveDataWithTicket(String ticket) async {
     String uuid = await cache.getStore(cache.anonymousUuidKey);
     String refreshToken = await cache.getStore(cache.refreshTokenKey);
-    CloudBaseResponse res = await CloudBaseRequest(super.core).postWithoutAuth('auth.linkAndRetrieveDataWithTicket', {
+    CloudBaseResponse res = await CloudBaseRequest(super.core).postWithoutAuth(
+        'auth.linkAndRetrieveDataWithTicket', {
       'anonymous_uuid': uuid,
       'refresh_token': refreshToken,
       'ticket': ticket
@@ -71,14 +73,10 @@ class AnonymousAuthProvider extends AuthProvider {
       await setRefreshToken(newRefreshToken);
       await refreshAccessToken();
 
-      return CloudBaseAuthState(
-          refreshToken: newRefreshToken
-      );
+      return CloudBaseAuthState(refreshToken: newRefreshToken);
     } else {
       throw CloudBaseException(
-        code: CloudBaseExceptionCode.AUTH_FAILED,
-        message: '匿名转化失败'
-      );
+          code: CloudBaseExceptionCode.AUTH_FAILED, message: '匿名转化失败');
     }
   }
 
@@ -93,5 +91,4 @@ class AnonymousAuthProvider extends AuthProvider {
   Future<void> _clearAnonymousUUID() async {
     await cache.removeStore(cache.anonymousUuidKey);
   }
-
 }

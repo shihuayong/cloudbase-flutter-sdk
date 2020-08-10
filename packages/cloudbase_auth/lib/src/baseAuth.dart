@@ -8,7 +8,6 @@ class AuthProvider implements ICloudBaseAuth {
 
   AuthCache _cache;
   CloudBaseCore _core;
-  CloudBaseAuthType _authType;
 
   AuthProvider(CloudBaseCore core) {
     _core = core;
@@ -35,8 +34,10 @@ class AuthProvider implements ICloudBaseAuth {
     await cache.removeStore(cache.accessTokenKey);
     await cache.removeStore(cache.accessTokenExpireKey);
     await cache.setStore(cache.refreshTokenKey, refreshToken);
+
     /// refresh token 30天后过期
-    await cache.setStore(cache.refreshTokenExpireKey, DateTime.now().add(Duration(days: 30)).millisecondsSinceEpoch);
+    await cache.setStore(cache.refreshTokenExpireKey,
+        DateTime.now().add(Duration(days: 30)).millisecondsSinceEpoch);
   }
 
   @override
@@ -62,18 +63,18 @@ class AuthProvider implements ICloudBaseAuth {
     String refreshToken = await cache.getStore(cache.refreshTokenKey);
     if (refreshToken == null || refreshToken.isEmpty) {
       throw CloudBaseException(
-        code: CloudBaseExceptionCode.NOT_LOGIN,
-        message: '未登录CLoudBase'
-      );
+          code: CloudBaseExceptionCode.NOT_LOGIN, message: '未登录CLoudBase');
     }
 
-    Map<String, dynamic> params = { 'refresh_token': refreshToken };
+    Map<String, dynamic> params = {'refresh_token': refreshToken};
+
     /// 匿名登录时传入uuid，若refresh token过期则可根据此uuid进行延期
     CloudBaseAuthType authType = await cache.getStore(cache.loginTypeKey);
     if (authType == CloudBaseAuthType.ANONYMOUS) {
       params['anonymous_uuid'] = await cache.getStore(cache.anonymousUuidKey);
     }
-    CloudBaseResponse res = await CloudBaseRequest(this.core).postWithoutAuth('auth.getJwt', params);
+    CloudBaseResponse res = await CloudBaseRequest(this.core)
+        .postWithoutAuth('auth.getJwt', params);
 
     if (res == null) {
       throw new CloudBaseException(
@@ -88,8 +89,12 @@ class AuthProvider implements ICloudBaseAuth {
     if (res.data != null) {
       if (res.data['access_token'] != null) {
         await cache.setStore(cache.accessTokenKey, res.data['access_token']);
+
         /// 本地时间可能没有同步
-        await cache.setStore(cache.accessTokenExpireKey, res.data["access_token_expire"]+DateTime.now().millisecondsSinceEpoch);
+        await cache.setStore(
+            cache.accessTokenExpireKey,
+            res.data["access_token_expire"] +
+                DateTime.now().millisecondsSinceEpoch);
       }
 
       /// 匿名登录refresh_token过期情况下返回refresh_token
@@ -101,22 +106,9 @@ class AuthProvider implements ICloudBaseAuth {
     }
   }
 
-  @override
-  Future<CloudBaseAuthType> getAuthType() async {
-    if (_authType == null) {
-      _authType = await cache.getStore(cache.loginTypeKey);
-    }
-
-    return _authType;
-  }
-
   Future<void> setAuthType(CloudBaseAuthType authType) async {
-    if (authType != _authType) {
-      await cache.setStore(cache.loginTypeKey, authType);
-      _authType = authType;
-    }
+    await cache.setStore(cache.loginTypeKey, authType);
   }
-
 
   @override
   Future<String> getAccessToken() async {
@@ -128,9 +120,9 @@ class AuthProvider implements ICloudBaseAuth {
     String accessToken = await cache.getStore(cache.accessTokenKey);
     int accessTokenExpired = await cache.getStore(cache.accessTokenExpireKey);
 
-    if (accessToken != null && accessTokenExpired != null 
-      && accessTokenExpired > DateTime.now().millisecondsSinceEpoch) {
-      
+    if (accessToken != null &&
+        accessTokenExpired != null &&
+        accessTokenExpired > DateTime.now().millisecondsSinceEpoch) {
       return accessToken;
     }
 

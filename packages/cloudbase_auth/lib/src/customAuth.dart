@@ -9,17 +9,15 @@ class CustomAuthProvider extends AuthProvider {
   Future<CloudBaseAuthState> signInWithTicket(String ticket) async {
     if (ticket == null || ticket.isEmpty) {
       throw CloudBaseException(
-        code: CloudBaseExceptionCode.EMPTY_PARAM,
-        message: 'signIn ticket is null'
-      );
+          code: CloudBaseExceptionCode.EMPTY_PARAM,
+          message: 'signIn ticket is null');
     }
 
     String refreshTokenKey = cache.refreshTokenKey;
     String refreshToken = await cache.getStore(refreshTokenKey);
-    CloudBaseResponse res = await CloudBaseRequest(super.core).postWithoutAuth('auth.signInWithTicket', {
-      'ticket': ticket,
-      'refresh_token': refreshToken
-    });
+    CloudBaseResponse res = await CloudBaseRequest(super.core).postWithoutAuth(
+        'auth.signInWithTicket',
+        {'ticket': ticket, 'refresh_token': refreshToken});
 
     if (res == null) {
       throw new CloudBaseException(
@@ -33,20 +31,15 @@ class CustomAuthProvider extends AuthProvider {
 
     if (res.data != null && res.data['refresh_token'] != null) {
       String newRefreshToken = res.data['refresh_token'];
+      await setAuthType(CloudBaseAuthType.CUSTOM);
       await setRefreshToken(newRefreshToken);
       await refreshAccessToken();
-      await setAuthType(CloudBaseAuthType.CUSTOM);
 
       return CloudBaseAuthState(
-        authType: CloudBaseAuthType.CUSTOM,
-        refreshToken: newRefreshToken
-      );
+          authType: CloudBaseAuthType.CUSTOM, refreshToken: newRefreshToken);
     } else {
       throw CloudBaseException(
-        code: CloudBaseExceptionCode.AUTH_FAILED,
-        message: '自定义登录失败'
-      );
+          code: CloudBaseExceptionCode.AUTH_FAILED, message: '自定义登录失败');
     }
   }
-
 }

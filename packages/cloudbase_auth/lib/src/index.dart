@@ -28,12 +28,14 @@ class CloudBaseAuth extends AuthProvider {
   }
 
   /// 微信登录
-  Future<CloudBaseAuthState> signInByWx({String wxAppId, String wxUniLink}) async {
+  Future<CloudBaseAuthState> signInByWx(
+      {String wxAppId, String wxUniLink}) async {
     if (_wxAuthProvider == null) {
       _wxAuthProvider = WxAuthProvider(super.core);
     }
 
-    CloudBaseAuthState authState = await _wxAuthProvider.signInByWx(wxAppId, wxUniLink);
+    CloudBaseAuthState authState =
+        await _wxAuthProvider.signInByWx(wxAppId, wxUniLink);
 
     return authState;
   }
@@ -44,7 +46,8 @@ class CloudBaseAuth extends AuthProvider {
       _customAuthProvider = CustomAuthProvider(super.core);
     }
 
-    CloudBaseAuthState authState = await _customAuthProvider.signInWithTicket(ticket);
+    CloudBaseAuthState authState =
+        await _customAuthProvider.signInWithTicket(ticket);
 
     return authState;
   }
@@ -55,29 +58,28 @@ class CloudBaseAuth extends AuthProvider {
       _anonymousAuthProvider = AnonymousAuthProvider(super.core);
     }
 
-    CloudBaseAuthState authState = await _anonymousAuthProvider.signInAnonymously();
+    CloudBaseAuthState authState =
+        await _anonymousAuthProvider.signInAnonymously();
 
     return authState;
   }
 
   /// 登出
   Future<void> signOut() async {
-    if (await getAuthType() == CloudBaseAuthType.ANONYMOUS) {
-      throw CloudBaseException(
-        code: CloudBaseExceptionCode.SIGN_OUT_FAILED,
-        message: '匿名用户不支持登出操作'
-      );
-    }
+    final state = await this.getAuthState();
 
-    String refreshToken = await cache.getStore(cache.refreshTokenKey);
-    if (refreshToken == null || refreshToken.isEmpty) {
-      /// 没有refreshToken, 不需要执行登出操作
+    if (state == null) {
+      /// 本地没有合法的登录态, 不需要执行登出操作
       return;
     }
 
-    CloudBaseResponse res = await CloudBaseRequest(super.core).post('auth.logout', {
-      'refresh_token': refreshToken
-    });
+    if (state.authType == CloudBaseAuthType.ANONYMOUS) {
+      throw CloudBaseException(
+          code: CloudBaseExceptionCode.SIGN_OUT_FAILED, message: '匿名用户不支持登出操作');
+    }
+
+    CloudBaseResponse res = await CloudBaseRequest(super.core)
+        .post('auth.logout', {'refresh_token': state.refreshToken});
 
     if (res == null) {
       throw CloudBaseException(
@@ -89,28 +91,21 @@ class CloudBaseAuth extends AuthProvider {
       throw CloudBaseException(code: res.code, message: res.message);
     }
 
-    await cache.removeStore(cache.refreshTokenKey);
-    await cache.removeStore(cache.refreshTokenExpireKey);
-    await cache.removeStore(cache.accessTokenKey);
-    await cache.removeStore(cache.accessTokenExpireKey);
-
-    await setAuthType(CloudBaseAuthType.EMPTY);
+    await cache.removeAllStore();
   }
 
   /// 获取登录状态
   Future<CloudBaseAuthState> getAuthState() async {
     String refreshToken = await cache.getStore(cache.refreshTokenKey);
     int refreshTokenExpire = await cache.getStore(cache.refreshTokenExpireKey);
-    if (refreshToken != null && 
+    if (refreshToken != null &&
         refreshToken.isNotEmpty &&
         refreshTokenExpire != null &&
         refreshTokenExpire > DateTime.now().millisecondsSinceEpoch) {
-
       return CloudBaseAuthState(
-        authType: await cache.getStore(cache.loginTypeKey),
-        refreshToken: refreshToken,
-        accessToken: await cache.getStore(cache.accessTokenKey)
-      );
+          authType: await cache.getStore(cache.loginTypeKey),
+          refreshToken: refreshToken,
+          accessToken: await cache.getStore(cache.accessTokenKey));
     }
 
     return null;
@@ -122,11 +117,10 @@ class CloudBaseAuth extends AuthProvider {
     String refreshToken = await cache.getStore(cache.refreshTokenKey);
     int refreshTokenExpire = await cache.getStore(cache.refreshTokenExpireKey);
 
-    if (refreshToken != null && 
+    if (refreshToken != null &&
         refreshToken.isNotEmpty &&
         refreshTokenExpire != null &&
         refreshTokenExpire < DateTime.now().millisecondsSinceEpoch) {
-
       return true;
     }
 
@@ -135,7 +129,8 @@ class CloudBaseAuth extends AuthProvider {
 
   /// 获取用户信息
   Future<CloudBaseUserInfo> getUserInfo() async {
-    CloudBaseResponse res = await CloudBaseRequest(super.core).post('auth.getUserInfo', {});
+    CloudBaseResponse res =
+        await CloudBaseRequest(super.core).post('auth.getUserInfo', {});
 
     if (res == null) {
       throw CloudBaseException(
