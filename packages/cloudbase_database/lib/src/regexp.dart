@@ -5,9 +5,12 @@ class RegExp {
   RegExp(this.regexp, [this.options]);
 
   Map<String, dynamic> toJson() {
-    return {
-      '\$regexp': regexp,
-      '\$options': options
-    };
+    var json = {'\$regex': regexp};
+
+    if (this.options != null) {
+      json['\$options'] = options;
+    }
+
+    return json;
   }
 }
