@@ -1,15 +1,14 @@
 import 'package:cloudbase_core/cloudbase_core.dart';
-import 'dart:io';
 import 'package:package_info/package_info.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
 /// 移动应用安全来源
 class Sign {
-
-  static Future<Map<String, dynamic>> signData(CloudBaseCore core, Map<String, dynamic> data) async {
+  static Future<Map<String, dynamic>> signData(
+      CloudBaseCore core, Map<String, dynamic> data) async {
     final appAccess = core.config.appAccess;
-    
+
     String secret = appAccess['key'];
     String version = appAccess['version'];
 
@@ -17,7 +16,7 @@ class Sign {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       String appSign = packageInfo.packageName;
       int timestamp = DateTime.now().millisecondsSinceEpoch;
-      
+
       var payload = {
         'data': data,
         'timestamp': timestamp,
@@ -40,10 +39,7 @@ class Sign {
   }
 
   static String _createSign(dynamic payload, String secret) {
-    var header = {
-      "alg": "HS256",
-      "typ": "JWT"
-    };
+    var header = {"alg": "HS256", "typ": "JWT"};
     var headerStr = _base64(utf8.encode(json.encode(header)));
     var payloadStr = _base64(utf8.encode(json.encode(payload)));
 

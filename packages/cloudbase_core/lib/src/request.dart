@@ -1,6 +1,5 @@
 import 'package:cloudbase_core/src/exception.dart';
 import 'package:dio/dio.dart';
-import './auth.dart';
 import './base.dart';
 import './sign.dart';
 import './trace.dart';
@@ -13,12 +12,12 @@ const String _TCB_WEB_URL = 'https://tcb-api.tencentcloudapi.com/web';
 class CloudBaseRequest {
   Dio _dio;
   CloudBaseCore _core;
-  ICloudBaseAuth _auth;
 
   CloudBaseRequest(CloudBaseCore core) {
     _core = core;
-    _auth = core.auth;
-    int timeout = core.config.timeout != null ? core.config.timeout : _TCB_DEFAULT_TIMEOUT;
+    int timeout = core.config.timeout != null
+        ? core.config.timeout
+        : _TCB_DEFAULT_TIMEOUT;
 
     _dio = Dio(BaseOptions(
         headers: {
@@ -35,28 +34,24 @@ class CloudBaseRequest {
   /// 发送请求，携带 accessToken
   Future<CloudBaseResponse> post(
       String action, Map<String, dynamic> data) async {
-
-    /// 如果没有注入auth对象, 则使用未登录模式调用请求
-    if (_auth == null) {
-      return await this.postWithoutAuth(action, data);
-    }
-
-    // 获取 accesstoken
-    String accessToken = await _auth.getAccessToken();
-
     data.addAll({
       'action': action,
       'env': _core.config.envId,
       'sdk_version': _VERSION,
       'dataVersion': _DATA_VERSION,
-      'access_token': accessToken
     });
+
+    if (_core.auth != null) {
+      // 获取 accesstoken
+      String accessToken = await _core.auth.getAccessToken();
+      data.addAll({'access_token': accessToken});
+    }
 
     data = await Sign.signData(_core, data);
     final Response response = await _tracePost(_TCB_WEB_URL, data);
 
     if (response.data['code'] == 'ACCESS_TOKEN_EXPIRED') {
-      await _auth.refreshAccessToken();
+      await _core.auth.refreshAccessToken();
       return await this.post(action, data);
     }
 
@@ -87,8 +82,10 @@ class CloudBaseRequest {
   Future<Response> _tracePost(String path, data) async {
     /// 添加 trace header
     await Trace(_core).addTrace(_dio);
+
     /// dio post
     final Response response = await _dio.post(path, data: data);
+
     /// 更新 trace header
     await Trace(_core).updateTrace(response);
 
@@ -96,12 +93,11 @@ class CloudBaseRequest {
   }
 
   /// 使用 form 表单传递文件
-  postFileByFormData({
-    String url,
-    String filePath,
-    Map<String, dynamic> metadata,
-    void onProcess(int count, int total)
-  }) async {
+  postFileByFormData(
+      {String url,
+      String filePath,
+      Map<String, dynamic> metadata,
+      void onProcess(int count, int total)}) async {
     if (filePath == null) {
       throw new CloudBaseException(
           code: CloudBaseExceptionCode.EMPTY_PARAM,
@@ -117,7 +113,8 @@ class CloudBaseRequest {
     await _dio.post(url, data: formData, onSendProgress: onProcess);
   }
 
-  download(String url, String savePath, void onProcess(int count, int total)) async {
+  download(
+      String url, String savePath, void onProcess(int count, int total)) async {
     await _dio.download(url, savePath, onReceiveProgress: onProcess);
   }
 }
