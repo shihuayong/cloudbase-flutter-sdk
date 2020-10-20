@@ -24,6 +24,9 @@ class CloudBaseUserInfo {
   /// 当前用户在微信(开放平台或公众平台)应用的openid
   String openid;
 
+  /// 当前用户在微信(开放平台或公众平台)应用的unionid
+  String unionid;
+
   /// 用户昵称
   String nickName;
 
@@ -47,7 +50,8 @@ class CloudBaseUserInfo {
     env = map['envName'];
     loginType = map['loginType'];
     appid = map['appid'];
-    openid = map['openid'];
+    openid = map['openid'] ?? map['wxOpenId'];
+    unionid = map['wxUnionId'];
     nickName = map['nickName'];
     gender = map['gender'];
     country = map['country'];
