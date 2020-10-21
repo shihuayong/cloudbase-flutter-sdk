@@ -39,6 +39,8 @@ build/
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
 **/android/.project
+**/android/.classpath
+**/android/.settings
 
 # iOS/XCode related
 **/ios/**/*.mode1v3
@@ -74,3 +76,9 @@ build/
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+
+.fake
+.ionide
+
+# packages should not commit lockfile
+**/pubspec.lock
