@@ -2,19 +2,19 @@
 
 @implementation CloudbaseWxAuth
 
-static CloudbaseWxAuth *instance = nil;
+static CloudbaseWxAuth *gInstance = nil;
 
 + (CloudbaseWxAuth*) initialize:(NSString *)wxAppid link:(NSString *)link callback:(FlutterResult)callback {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    instance = [[CloudbaseWxAuth alloc] initWithAppid:wxAppid link:link callback:callback];
+    gInstance = [[CloudbaseWxAuth alloc] initWithAppid:wxAppid link:link callback:callback];
   });
     
-  return instance;
+  return gInstance;
 }
 
 + (CloudbaseWxAuth*) getInstance {
-    return instance;
+    return gInstance;
 }
 
 - (CloudbaseWxAuth*) initWithAppid:(NSString *)wxAppid link:(NSString *)link callback:(FlutterResult)callback {
