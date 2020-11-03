@@ -29,7 +29,8 @@ public class CloudbaseWxAuth implements IWXAPIEventHandler, ActivityLifecycleCal
     this.wxAppId = wxAppId;
 
     // 获取应用对象
-    Application application = (Application) Class.forName("android.app.AppGlobals").getMethod("getInitialApplication").invoke(null, (Object[]) null);
+    Application application = (Application) Class.forName("android.app.AppGlobals")
+        .getMethod("getInitialApplication").invoke(null, (Object[]) null);
 
     // 注册app
     wxApi = WXAPIFactory.createWXAPI(application, wxAppId, true);

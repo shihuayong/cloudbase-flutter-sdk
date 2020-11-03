@@ -14,7 +14,10 @@ public class CloudbaseAuthPlugin implements FlutterPlugin, MethodCallHandler {
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-    final MethodChannel channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "cloudbase_auth");
+    final MethodChannel channel = new MethodChannel(
+        flutterPluginBinding.getFlutterEngine().getDartExecutor(),
+        "cloudbase_auth"
+    );
     channel.setMethodCallHandler(new CloudbaseAuthPlugin());
   }
 
@@ -41,11 +44,14 @@ public class CloudbaseAuthPlugin implements FlutterPlugin, MethodCallHandler {
       case "wxauth.login":
         handleWxAuthLogin(call, result);
         break;
+      default:
+        break;
     }
   }
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+    // do nothing
   }
 
   private void handleWxAuthRegister(MethodCall call, Result result) {
