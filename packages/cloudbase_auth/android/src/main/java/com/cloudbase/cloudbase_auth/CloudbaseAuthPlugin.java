@@ -1,4 +1,6 @@
+// CHECKSTYLE:OFF
 package com.cloudbase.cloudbase_auth;
+// CHECKSTYLE:ON
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;

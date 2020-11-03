@@ -1,4 +1,6 @@
+// CHECKSTYLE:OFF
 package com.cloudbase.cloudbase_auth;
+// CHECKSTYLE:ON
 
 import android.app.Activity;
 import android.app.Application;
