@@ -1,6 +1,8 @@
 import 'package:test/test.dart';
 import 'package:cloudbase_dart/cloudbase_dart.dart';
 
+import 'config.dart' as testConfig;
+
 final data = {
   'x;y;z': 0,
   'c121': 0,
@@ -24,9 +26,8 @@ final data = {
 void main() {
   group('SortedKeyValue', () {
     test('SortedKeyValue.kv', () {
-      final kv = SortedKeyValue({
-        'ccc': 1, 'aa': 2, 'a11': 3, 'a01': 4, 'bb': 5, 'a22': 6, 'a1': 7
-      });
+      final kv = SortedKeyValue(
+          {'ccc': 1, 'aa': 2, 'a11': 3, 'a01': 4, 'bb': 5, 'a22': 6, 'a1': 7});
 
       expect(kv.keys, ['a01', 'a1', 'a11', 'a22', 'aa', 'bb', 'ccc']);
       expect(kv.values, [4, 7, 3, 6, 2, 5, 1]);
@@ -41,15 +42,16 @@ void main() {
       ]);
       expect(kv.get('aa'), 2);
       expect(kv.toString(), 'a01=4&a1=7&a11=3&a22=6&aa=2&bb=5&ccc=1');
-      expect(kv.toString(kvSeparator: ':'), 'a01:4&a1:7&a11:3&a22:6&aa:2&bb:5&ccc:1');
-      expect(kv.toString(kvSeparator: ':', joinSeparator: ','), 'a01:4,a1:7,a11:3,a22:6,aa:2,bb:5,ccc:1');
+      expect(kv.toString(kvSeparator: ':'),
+          'a01:4&a1:7&a11:3&a22:6&aa:2&bb:5&ccc:1');
+      expect(kv.toString(kvSeparator: ':', joinSeparator: ','),
+          'a01:4,a1:7,a11:3,a22:6,aa:2,bb:5,ccc:1');
     });
 
     test('SortedKeyValue.kv with selectkeys', () {
       final kv = SortedKeyValue(
-        { 'ccc': 1, 'aa': 2, 'a11': 3, 'a01': 4, 'bb': 5, 'a22': 6, 'a1': 7},
-        ['a01', 'a1', 'a11', 'a22', 'bb', 'ccc']
-      );
+          {'ccc': 1, 'aa': 2, 'a11': 3, 'a01': 4, 'bb': 5, 'a22': 6, 'a1': 7},
+          ['a01', 'a1', 'a11', 'a22', 'bb', 'ccc']);
 
       expect(kv.keys, ['a01', 'a1', 'a11', 'a22', 'bb', 'ccc']);
       expect(kv.values, [4, 7, 3, 6, 5, 1]);
@@ -59,31 +61,28 @@ void main() {
   group('Signer', () {
     test('demo', () {
       final signer = Signer(
-        secretId: 'AKIDz8krbsJ5yKBZQpn74WFkmLPx3EXAMPLE',
-        secretKey: 'Gu5t9xGARNpq86cd98joQYCN3EXAMPLE',
-        service: 'cvm'
-      );
+          secretId: testConfig.signSecretId,
+          secretKey: testConfig.signSecretKey,
+          service: 'cvm');
 
       final signInfo = signer.tc3sign(
-        method: 'POST',
-        url: '/',
-        headers: {
-          'content-type': 'application/json; charset=utf-8',
-          'host': 'cvm.tencentcloudapi.com'
-        },
-        params: '{"Limit": 1, "Filters": [{"Values": ["\\u672a\\u547d\\u540d"], "Name": "instance-name"}]}',
-        timestamp: 1551113065,
-        options: {
-          'enableHostCheck': false,
-          'enableContentTypeCheck': false
-        }
-      );
+          method: 'POST',
+          url: '/',
+          headers: {
+            'content-type': 'application/json; charset=utf-8',
+            'host': 'cvm.tencentcloudapi.com'
+          },
+          params:
+              '{"Limit": 1, "Filters": [{"Values": ["\\u672a\\u547d\\u540d"], "Name": "instance-name"}]}',
+          timestamp: 1551113065,
+          options: {'enableHostCheck': false, 'enableContentTypeCheck': false});
 
       expect(signInfo, {
-        'authorization': 'TC3-HMAC-SHA256 Credential=AKIDz8krbsJ5yKBZQpn74WFkmLPx3EXAMPLE/2019-02-25/cvm/tc3_request, SignedHeaders=content-type;host, Signature=72e494ea809ad7a8c8f7a4507b9bddcbaa8e581f516e8da2f66e2c5a96525168',
+        'authorization': testConfig.signAuthorization,
         'signedHeaders': ['content-type', 'host'],
         'signedParams': [],
-        'signature': '72e494ea809ad7a8c8f7a4507b9bddcbaa8e581f516e8da2f66e2c5a96525168',
+        'signature':
+            '72e494ea809ad7a8c8f7a4507b9bddcbaa8e581f516e8da2f66e2c5a96525168',
         'timestamp': 1551113065,
         'multipart': false
       });
@@ -93,14 +92,16 @@ void main() {
       var exception;
       try {
         final signInfo = Signer.sign(
-          secretId: 'AKIDz8krbsJ5yKBZQpn74WFkmLPx3EXAMPLE',
-          secretKey: 'Gu5t9xGARNpq86cd98joQYCN3EXAMPLE',
+          secretId: testConfig.signSecretId,
+          secretKey: testConfig.signSecretKey,
           method: 'GET',
           url: 'http://cvm.tencentcloudapi.com/?a=1&b=2&&c=3#t',
-          headers: Map<String, dynamic>.from(data)..addAll({
-            'content-type': 'application/x-www-form-urlencoded; charset=utf-8',
-            'host': 'xxx.tencentcloudapi.com',
-          }),
+          headers: Map<String, dynamic>.from(data)
+            ..addAll({
+              'content-type':
+                  'application/x-www-form-urlencoded; charset=utf-8',
+              'host': 'xxx.tencentcloudapi.com',
+            }),
           params: Map<String, dynamic>.from(data),
           timestamp: 1575461831,
         );
@@ -115,14 +116,15 @@ void main() {
       var exception;
       try {
         final signInfo = Signer.sign(
-          secretId: 'AKIDz8krbsJ5yKBZQpn74WFkmLPx3EXAMPLE',
-          secretKey: 'Gu5t9xGARNpq86cd98joQYCN3EXAMPLE',
+          secretId: testConfig.signSecretId,
+          secretKey: testConfig.signSecretKey,
           method: 'GET',
           url: 'http://cvm.tencentcloudapi.com/?a=1&b=2&&c=3#t',
-          headers: Map<String, dynamic>.from(data)..addAll({
-            // 'content-type': 'application/x-www-form-urlencoded; charset=utf-8',
-            'host': 'cvm.tencentcloudapi.com',
-          }),
+          headers: Map<String, dynamic>.from(data)
+            ..addAll({
+              // 'content-type': 'application/x-www-form-urlencoded; charset=utf-8',
+              'host': 'cvm.tencentcloudapi.com',
+            }),
           params: Map<String, dynamic>.from(data),
           timestamp: 1575461831,
         );
@@ -133,5 +135,4 @@ void main() {
       expect(exception, isNot(null));
     });
   });
-    
 }
