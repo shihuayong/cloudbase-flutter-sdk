@@ -1,3 +1,5 @@
+// Copyright 2020
+
 #import "CloudbaseWxAuthDelegate.h"
 
 @implementation CloudbaseWxAuthDelegate

@@ -1,3 +1,5 @@
+// Copyright 2020
+
 #import "CloudbaseAuthPlugin.h"
 #import "CloudbaseWxAuth.h"
 

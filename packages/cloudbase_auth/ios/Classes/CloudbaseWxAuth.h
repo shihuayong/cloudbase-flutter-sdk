@@ -1,3 +1,5 @@
+// Copyright 2020
+
 #import "WXApi.h"
 #import <Flutter/Flutter.h>
 #import "CloudbaseWxAuthDelegate.h"

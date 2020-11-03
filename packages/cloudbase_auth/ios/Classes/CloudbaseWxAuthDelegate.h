@@ -1,3 +1,5 @@
+// Copyright 2020
+
 #import "Aspects.h"
 #import "WXApi.h"
 #import <Flutter/Flutter.h>
