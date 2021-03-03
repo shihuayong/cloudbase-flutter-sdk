@@ -70,7 +70,7 @@ class Serializer {
           docs.add(_formatGeoField(type, item));
           break;
         case 'ServerDate':
-          docs.add(DateTime.fromMicrosecondsSinceEpoch(item * 1000));
+          docs.add(DateTime.fromMicrosecondsSinceEpoch(item['\$date'] * 1000));
           break;
 
         default:
