@@ -83,3 +83,6 @@ build/
 # packages should not commit lockfile
 **/pubspec.lock
 packages/cloudbase_dart/test/config.dart
+
+# melos
+.melos_tool/*
