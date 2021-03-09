@@ -32,7 +32,7 @@ class DbQueryResponse {
       'offset': offset,
     };
 
-    return jsonEncode(json);
+    return jsonEncode(json, toEncodable:(value) => value.toString());
   }
 }
 
